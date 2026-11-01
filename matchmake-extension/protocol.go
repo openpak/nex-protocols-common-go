@@ -197,10 +197,18 @@ func NewCommonProtocol(protocol matchmake_extension.Interface) *CommonProtocol {
 	protocol.SetHandlerGetFriendNotificationData(commonProtocol.getFriendNotificationData)
 	protocol.SetHandlerGetlstFriendNotificationData(commonProtocol.getlstFriendNotificationData)
 	protocol.SetHandlerUpdateMatchmakeSessionAttribute(commonProtocol.updateMatchmakeSessionAttribute)
-	protocol.SetHandlerGetMyBlockList(commonProtocol.getMyBlockList)
-	protocol.SetHandlerClearMyBlockList(commonProtocol.clearMyBlockList)
-	protocol.SetHandlerFindMatchmakeSessionByParticipant(commonProtocol.findMatchmakeSessionByParticipant)
-	protocol.SetHandlerFindMatchmakeSessionByGatheringIDDetail(commonProtocol.findMatchmakeSessionByGatheringIDDetail)
+	if !alreadyHandled(protocol, "GetMyBlockList") {
+		protocol.SetHandlerGetMyBlockList(commonProtocol.getMyBlockList)
+	}
+	if !alreadyHandled(protocol, "ClearMyBlockList") {
+		protocol.SetHandlerClearMyBlockList(commonProtocol.clearMyBlockList)
+	}
+	if !alreadyHandled(protocol, "FindMatchmakeSessionByParticipant") {
+		protocol.SetHandlerFindMatchmakeSessionByParticipant(commonProtocol.findMatchmakeSessionByParticipant)
+	}
+	if !alreadyHandled(protocol, "FindMatchmakeSessionByGatheringIDDetail") {
+		protocol.SetHandlerFindMatchmakeSessionByGatheringIDDetail(commonProtocol.findMatchmakeSessionByGatheringIDDetail)
+	}
 
 	endpoint.OnConnectionEnded(func(connection *nex.PRUDPConnection) {
 		commonProtocol.manager.Mutex.Lock()

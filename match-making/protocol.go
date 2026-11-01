@@ -175,14 +175,30 @@ func NewCommonProtocol(protocol match_making.Interface) *CommonProtocol {
 	protocol.SetHandlerUpdateSessionHostV1(commonProtocol.updateSessionHostV1)
 	protocol.SetHandlerGetSessionURLs(commonProtocol.getSessionURLs)
 	protocol.SetHandlerUpdateSessionHost(commonProtocol.updateSessionHost)
-	protocol.SetHandlerFindByOwner(commonProtocol.findByOwner)
-	protocol.SetHandlerFindByType(commonProtocol.findByType)
-	protocol.SetHandlerFindByDescription(commonProtocol.findByDescription)
-	protocol.SetHandlerFindByDescriptionRegex(commonProtocol.findByDescriptionRegex)
-	protocol.SetHandlerFindByID(commonProtocol.findByID)
-	protocol.SetHandlerFindByParticipants(commonProtocol.findByParticipants)
-	protocol.SetHandlerFindInvitations(commonProtocol.findInvitations)
-	protocol.SetHandlerFindBySQLQuery(commonProtocol.findBySQLQuery)
+	if !alreadyHandled(protocol, "FindByOwner") {
+		protocol.SetHandlerFindByOwner(commonProtocol.findByOwner)
+	}
+	if !alreadyHandled(protocol, "FindByType") {
+		protocol.SetHandlerFindByType(commonProtocol.findByType)
+	}
+	if !alreadyHandled(protocol, "FindByDescription") {
+		protocol.SetHandlerFindByDescription(commonProtocol.findByDescription)
+	}
+	if !alreadyHandled(protocol, "FindByDescriptionRegex") {
+		protocol.SetHandlerFindByDescriptionRegex(commonProtocol.findByDescriptionRegex)
+	}
+	if !alreadyHandled(protocol, "FindByID") {
+		protocol.SetHandlerFindByID(commonProtocol.findByID)
+	}
+	if !alreadyHandled(protocol, "FindByParticipants") {
+		protocol.SetHandlerFindByParticipants(commonProtocol.findByParticipants)
+	}
+	if !alreadyHandled(protocol, "FindInvitations") {
+		protocol.SetHandlerFindInvitations(commonProtocol.findInvitations)
+	}
+	if !alreadyHandled(protocol, "FindBySQLQuery") {
+		protocol.SetHandlerFindBySQLQuery(commonProtocol.findBySQLQuery)
+	}
 
 	endpoint.OnConnectionEnded(func(connection *nex.PRUDPConnection) {
 		commonProtocol.manager.Mutex.Lock()
