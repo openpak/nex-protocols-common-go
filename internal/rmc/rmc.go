@@ -52,3 +52,17 @@ func NotImplemented(method string) *nex.Error {
 
 	return nex.NewError(nex.ResultCodes.Core.NotImplemented, message)
 }
+
+// RespondRaw answers with an already encoded body, for methods whose response layout is not documented
+func RespondRaw(packet nex.PacketInterface, protocolID uint16, methodID uint32, callID uint32, body []byte) *nex.RMCMessage {
+	if len(body) == 0 {
+		body = nil
+	}
+
+	response := nex.NewRMCSuccess(packet.Sender().Endpoint(), body)
+	response.ProtocolID = protocolID
+	response.MethodID = methodID
+	response.CallID = callID
+
+	return response
+}
