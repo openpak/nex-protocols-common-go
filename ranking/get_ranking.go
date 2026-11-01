@@ -72,7 +72,7 @@ func (commonProtocol *CommonProtocol) getRanking(err error, packet nex.PacketInt
 		return nil, nex.NewError(nex.ResultCodes.Ranking.Unknown, "change_error")
 	}
 
-	if totalCount == 0 || len(rankDataList) == 0 {
+	if (totalCount == 0 || len(rankDataList) == 0) && !commonProtocol.emptyBoards {
 		return nil, nex.NewError(nex.ResultCodes.Ranking.NotFound, "change_error")
 	}
 

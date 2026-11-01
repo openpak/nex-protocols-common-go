@@ -13,6 +13,7 @@ type CommonProtocol struct {
 	protocol                    secure_connection.Interface
 	CreateReportDBRecord        func(pid types.PID, reportID types.UInt32, reportData types.QBuffer) error
 	ValidateLoginData           func(pid types.PID, loginData types.DataHolder) *nex.Error
+	TestConnectivity            func(pid types.PID) error // optional; TestConnectivity is acknowledged unless this returns an error
 	allowInsecureRegisterMethod bool
 	OnAfterRegister             func(packet nex.PacketInterface, vecMyURLs types.List[types.StationURL])
 	OnAfterRequestURLs          func(packet nex.PacketInterface, cidTarget types.UInt32, pidTarget types.PID)
@@ -51,6 +52,7 @@ func NewCommonProtocol(protocol secure_connection.Interface) *CommonProtocol {
 	protocol.SetHandlerRegisterEx(commonProtocol.registerEx)
 	protocol.SetHandlerReplaceURL(commonProtocol.replaceURL)
 	protocol.SetHandlerSendReport(commonProtocol.sendReport)
+	protocol.SetHandlerTestConnectivity(commonProtocol.testConnectivity)
 
 	return commonProtocol
 }
