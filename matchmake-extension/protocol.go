@@ -46,6 +46,14 @@ type CommonProtocol struct {
 	OnAfterGetFriendNotificationData               func(packet nex.PacketInterface, uiType notifications_constants.NotificationCategorySigned)
 	OnAfterGetlstFriendNotificationData            func(packet nex.PacketInterface, lstTypes types.List[notifications_constants.NotificationCategory])
 	OnAfterUpdateMatchmakeSessionAttribute         func(packet nex.PacketInterface, gid types.UInt32, attribs types.List[types.UInt32])
+
+	// * GetMyBlockList and ClearMyBlockList are hook driven, the common library keeps no block list.
+	// * When a hook is nil, GetMyBlockList answers an empty list and ClearMyBlockList answers success
+	GetMyBlockList   func(packet nex.PacketInterface) (types.List[types.PID], *nex.Error)
+	ClearMyBlockList func(packet nex.PacketInterface) *nex.Error
+
+	OnAfterFindMatchmakeSessionByParticipant       func(packet nex.PacketInterface, param match_making_types.FindMatchmakeSessionByParticipantParam)
+	OnAfterFindMatchmakeSessionByGatheringIDDetail func(packet nex.PacketInterface, gid types.UInt32)
 }
 
 // SetDatabase defines the matchmaking manager to be used by the common protocol
@@ -189,6 +197,10 @@ func NewCommonProtocol(protocol matchmake_extension.Interface) *CommonProtocol {
 	protocol.SetHandlerGetFriendNotificationData(commonProtocol.getFriendNotificationData)
 	protocol.SetHandlerGetlstFriendNotificationData(commonProtocol.getlstFriendNotificationData)
 	protocol.SetHandlerUpdateMatchmakeSessionAttribute(commonProtocol.updateMatchmakeSessionAttribute)
+	protocol.SetHandlerGetMyBlockList(commonProtocol.getMyBlockList)
+	protocol.SetHandlerClearMyBlockList(commonProtocol.clearMyBlockList)
+	protocol.SetHandlerFindMatchmakeSessionByParticipant(commonProtocol.findMatchmakeSessionByParticipant)
+	protocol.SetHandlerFindMatchmakeSessionByGatheringIDDetail(commonProtocol.findMatchmakeSessionByGatheringIDDetail)
 
 	endpoint.OnConnectionEnded(func(connection *nex.PRUDPConnection) {
 		commonProtocol.manager.Mutex.Lock()

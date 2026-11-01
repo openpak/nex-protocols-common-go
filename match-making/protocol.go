@@ -175,6 +175,14 @@ func NewCommonProtocol(protocol match_making.Interface) *CommonProtocol {
 	protocol.SetHandlerUpdateSessionHostV1(commonProtocol.updateSessionHostV1)
 	protocol.SetHandlerGetSessionURLs(commonProtocol.getSessionURLs)
 	protocol.SetHandlerUpdateSessionHost(commonProtocol.updateSessionHost)
+	protocol.SetHandlerFindByOwner(commonProtocol.findByOwner)
+	protocol.SetHandlerFindByType(commonProtocol.findByType)
+	protocol.SetHandlerFindByDescription(commonProtocol.findByDescription)
+	protocol.SetHandlerFindByDescriptionRegex(commonProtocol.findByDescriptionRegex)
+	protocol.SetHandlerFindByID(commonProtocol.findByID)
+	protocol.SetHandlerFindByParticipants(commonProtocol.findByParticipants)
+	protocol.SetHandlerFindInvitations(commonProtocol.findInvitations)
+	protocol.SetHandlerFindBySQLQuery(commonProtocol.findBySQLQuery)
 
 	endpoint.OnConnectionEnded(func(connection *nex.PRUDPConnection) {
 		commonProtocol.manager.Mutex.Lock()
