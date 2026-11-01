@@ -11,6 +11,7 @@ import (
 type CommonProtocol struct {
 	endpoint                                                       nex.EndpointInterface
 	protocol                                                       ranking.Interface
+	emptyBoards                                                    bool
 	GetCommonData                                                  func(uniqueID types.UInt64) (types.Buffer, error)
 	UploadCommonData                                               func(pid types.PID, uniqueID types.UInt64, commonData types.Buffer) error
 	InsertRankingByPIDAndRankingScoreData                          func(pid types.PID, rankingScoreData ranking_types.RankingScoreData, uniqueID types.UInt64) error
@@ -42,4 +43,64 @@ func NewCommonProtocol(protocol ranking.Interface) *CommonProtocol {
 	protocol.SetHandlerUploadScore(commonProtocol.uploadScore)
 
 	return commonProtocol
+}
+
+// UseEmptyBoards is a stopgap for titles that register the Ranking protocol
+// with no storage behind it. It installs hooks that accept score and common
+// data uploads and throw them away, and that answer every read with an empty
+// board: no entries, a total count of zero and empty common data. Instead of
+// Ranking::NotFound, the ranking getters then send an empty result.
+//
+// Only hooks that are still nil are filled, so call it after setting the hooks
+// the game server really implements. Nothing is stored: scores uploaded
+// through the installed hooks are lost, and a title that needs real rankings
+// must supply its own hooks instead.
+func (commonProtocol *CommonProtocol) UseEmptyBoards() {
+	commonProtocol.emptyBoards = true
+
+	emptyList := func() types.List[ranking_types.RankingRankData] {
+		return types.NewList[ranking_types.RankingRankData]()
+	}
+
+	if commonProtocol.GetCommonData == nil {
+		commonProtocol.GetCommonData = func(types.UInt64) (types.Buffer, error) {
+			return types.Buffer{}, nil
+		}
+	}
+
+	if commonProtocol.UploadCommonData == nil {
+		commonProtocol.UploadCommonData = func(types.PID, types.UInt64, types.Buffer) error { return nil }
+	}
+
+	if commonProtocol.InsertRankingByPIDAndRankingScoreData == nil {
+		commonProtocol.InsertRankingByPIDAndRankingScoreData = func(types.PID, ranking_types.RankingScoreData, types.UInt64) error {
+			return nil
+		}
+	}
+
+	if commonProtocol.GetRankingsAndCountByCategoryAndRankingOrderParam == nil {
+		commonProtocol.GetRankingsAndCountByCategoryAndRankingOrderParam = func(types.UInt32, ranking_types.RankingOrderParam) (types.List[ranking_types.RankingRankData], uint32, error) {
+			return emptyList(), 0, nil
+		}
+	}
+
+	byPID := func(types.PID, types.UInt32, ranking_types.RankingOrderParam) (types.List[ranking_types.RankingRankData], uint32, error) {
+		return emptyList(), 0, nil
+	}
+
+	if commonProtocol.GetNearbyRankingsAndCountByCategoryAndRankingOrderParam == nil {
+		commonProtocol.GetNearbyRankingsAndCountByCategoryAndRankingOrderParam = byPID
+	}
+
+	if commonProtocol.GetFriendsRankingsAndCountByCategoryAndRankingOrderParam == nil {
+		commonProtocol.GetFriendsRankingsAndCountByCategoryAndRankingOrderParam = byPID
+	}
+
+	if commonProtocol.GetNearbyFriendsRankingsAndCountByCategoryAndRankingOrderParam == nil {
+		commonProtocol.GetNearbyFriendsRankingsAndCountByCategoryAndRankingOrderParam = byPID
+	}
+
+	if commonProtocol.GetOwnRankingByCategoryAndRankingOrderParam == nil {
+		commonProtocol.GetOwnRankingByCategoryAndRankingOrderParam = byPID
+	}
 }
