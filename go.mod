@@ -7,7 +7,7 @@ toolchain go1.24.3
 require (
 	github.com/PretendoNetwork/grpc/go v0.0.0-20260501210425-981c793afb28
 	github.com/PretendoNetwork/nex-go/v2 v2.3.1
-	github.com/PretendoNetwork/nex-protocols-go/v2 v2.3.5
+	github.com/PretendoNetwork/nex-protocols-go/v2 v2.3.7
 	github.com/PretendoNetwork/plogger-go v1.1.0
 	github.com/PretendoNetwork/pq-extended v1.0.0
 	github.com/minio/minio-go/v7 v7.0.90
@@ -52,3 +52,7 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251029180050-ab9386a59fda // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 )
+
+// OpenPak fork: carries the Ubisoft/Quazal definitions and the Nintendo additions this module needs.
+// Drop this line when those land upstream (see the openpak/nex-protocols-go branch openpak).
+replace github.com/PretendoNetwork/nex-protocols-go/v2 => github.com/openpak/nex-protocols-go/v2 v2.3.8-openpak.2

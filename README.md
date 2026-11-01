@@ -75,3 +75,14 @@ func main() {
 	nexServer.Listen(60000)
 }
 ```
+
+### OpenPak fork
+
+This is OpenPak's fork of the Pretendo module. Branch `openpak` is upstream `main` plus, as
+separate commits: hook-driven handlers for the protocols upstream lacks (ranking 2, rating,
+subscription, storage manager, matchmake referee, persistent store, account management, friends,
+screening, AA user, subscriber, Pokemon Bank shop), more matchmaking methods, and the Ubisoft /
+Quazal Rendez-Vous set under `ubisoft/`. Every commit is self-contained so it can be sent upstream
+on its own. Its `go.mod` carries a `replace` to the OpenPak `nex-protocols-go` fork for building
+standalone; consumers add their own replaces and drop this one when the definitions are upstream.
+Licence unchanged (AGPL-3.0).
