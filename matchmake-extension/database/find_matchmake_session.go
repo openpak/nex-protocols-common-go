@@ -66,7 +66,7 @@ func FindMatchmakeSession(manager *common_globals.MatchmakingManager, connection
 		ms.attribs[5]=$8 AND
 		ms.attribs[6]=$9 AND
 		ms.matchmake_system_type=$10 AND
-		ms.codeword=$11 AND (CASE WHEN g.participation_policy=98 THEN g.owner_pid=ANY($12) ELSE true END)
+		ms.codeword=$11 AND (CASE WHEN g.participation_policy=98 THEN g.owner_pid=ANY($12) ELSE true END)`+manager.CandidateClause(connection)+`
 		ORDER BY abs($5 - ms.attribs[2])` // * Use "Closest attribute" selection method, guessing from Mario Kart 7
 
 	var friendList []uint32

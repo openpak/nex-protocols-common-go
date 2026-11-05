@@ -121,6 +121,8 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 			continue
 		}
 
+		searchStatement += manager.CandidateClause(connection)
+
 		if searchCriteria.MaxParticipants != "" {
 			before, after, found := strings.Cut(string(searchCriteria.MaxParticipants), ",")
 			if found {

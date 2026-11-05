@@ -2,6 +2,8 @@ package common_globals
 
 import (
 	"database/sql"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/PretendoNetwork/nex-go/v2"
@@ -19,6 +21,31 @@ type MatchmakingManager struct {
 	MatchmakeSessionBufferLength int
 	GetUserFriendPIDs            func(pid uint32) []uint32
 	GetDetailedGatheringByID     func(manager *MatchmakingManager, sourcePID uint64, gatheringID uint32) (types.RVType, string, *nex.Error)
+	// CandidateGatherings, when set, restricts the gatherings a search may return to the ids it
+	// answers (an empty, non-nil slice means none). Titles that keep their rooms in an external
+	// matchmaking service use it to let that service decide who may be found. A nil result means
+	// no restriction, so a failing service never makes the search worse than the plain tables.
+	CandidateGatherings func(connection *nex.PRUDPConnection) []uint32
+}
+
+// CandidateClause returns the SQL condition for CandidateGatherings (" AND g.id IN (...)"), or ""
+// when no restriction applies. Ids are numbers, so they are written inline.
+func (mm *MatchmakingManager) CandidateClause(connection *nex.PRUDPConnection) string {
+	if mm.CandidateGatherings == nil {
+		return ""
+	}
+	ids := mm.CandidateGatherings(connection)
+	if ids == nil {
+		return ""
+	}
+	if len(ids) == 0 {
+		return " AND false"
+	}
+	parts := make([]string, len(ids))
+	for i, id := range ids {
+		parts[i] = strconv.FormatUint(uint64(id), 10)
+	}
+	return " AND g.id IN (" + strings.Join(parts, ",") + ")"
 }
 
 // CheckValidGathering checks if a Gathering is valid
